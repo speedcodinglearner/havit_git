@@ -1,0 +1,81 @@
+# ============================================================
+# Image Classification with LoRA - Configuration
+# ============================================================
+
+# Model
+model:
+  name: "google/vit-large-patch16-224"  # SOTA ViT-Large pretrained model
+  num_labels: null                       # Auto-detected from dataset
+  pretrained: true
+
+# LoRA
+lora:
+  r: 16                    # LoRA rank
+  lora_alpha: 32           # LoRA scaling factor
+  lora_dropout: 0.1        # Dropout for LoRA layers
+  target_modules:          # Modules to apply LoRA
+    - "query"
+    - "value"
+  bias: "none"             # Bias type: "none", "all", "lora_only"
+
+# Dataset
+dataset:
+  # Option 1: Local folder (ImageFolder format)
+  #   data_dir: "/path/to/your/dataset"
+  #   Expected structure:
+  #     data_dir/
+  #       train/
+  #         class_a/
+  #           img1.jpg
+  #         class_b/
+  #           img2.jpg
+  #       val/
+  #         class_a/
+  #           img3.jpg
+  #         class_b/
+  #           img4.jpg
+  #
+  # Option 2: HuggingFace dataset
+  #   hf_dataset: "cifar10"  (or any HF dataset name)
+
+  data_dir: null
+  hf_dataset: null
+  image_size: 224
+  train_split: "train"
+  val_split: "val"
+  test_split: null          # Optional separate test split
+  train_ratio: 0.8          # Used only if val split doesn't exist
+
+# Training
+training:
+  output_dir: "./outputs"
+  num_epochs: 10
+  batch_size: 32
+  learning_rate: 5.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  lr_scheduler: "cosine"    # "cosine", "linear", "constant"
+  max_grad_norm: 1.0
+  fp16: true                # Mixed precision training
+  seed: 42
+  save_strategy: "epoch"    # "epoch" or "steps"
+  save_total_limit: 3
+  eval_strategy: "epoch"
+  logging_steps: 50
+  dataloader_num_workers: 4
+
+# Evaluation
+evaluation:
+  batch_size: 64
+  metrics:
+    - "accuracy"
+    - "f1"
+    - "precision"
+    - "recall"
+
+# Inference
+inference:
+  checkpoint_path: null      # Path to LoRA checkpoint, auto-resolved if null
+  batch_size: 1
+  top_k: 5                  # Top-K predictions to return
+  device: "auto"            # "auto", "cuda", "cpu"
