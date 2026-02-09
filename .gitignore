@@ -10,3 +10,5 @@ outputs/
 *.safetensors
 .env
 wandb/
+.pytest_cache/
+tests/report/
